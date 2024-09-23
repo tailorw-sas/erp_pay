@@ -1,5 +1,4 @@
 <script setup>
-import 'primevue/resources/themes/aura-light-green/theme.css'
 import '~/assets/styles.scss'
 
 import { ref } from 'vue';
