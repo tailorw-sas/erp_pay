@@ -7,5 +7,14 @@ export default defineNuxtConfig({
   ],
   css: [
       'primevue/resources/themes/aura-light-blue/theme.css'
-  ]
+  ],
+  vite: {
+    css: {
+      preprocessorOptions: {
+        scss: {
+          api: 'modern-compiler' // o "modern"
+        }
+      }
+    }
+  }
 })
