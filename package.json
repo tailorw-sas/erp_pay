@@ -16,7 +16,8 @@
     "primevue": "^3.52.0",
     "sass-loader": "^16.0.2",
     "vue": "latest",
-    "vue-router": "latest"
+    "vue-router": "latest",
+    "dayjs": "^1.11.11"
   },
   "devDependencies": {
     "nuxt-primevue": "^3.0.0",
