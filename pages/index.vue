@@ -2,6 +2,5 @@
 </script>
 <template>
   <div>
-    adsadsd
   </div>
 </template>
