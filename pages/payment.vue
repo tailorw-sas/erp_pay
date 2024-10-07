@@ -28,9 +28,9 @@ async function handleMerchantRedirect(tokenInfo: any) {
       },
       body: JSON.stringify(data),
     })
-    console.log(response)
-    if (response.status === 200) {
-      const jsonResponse = await response.json()
+    // console.log(response)
+    const jsonResponse = await response.json()
+    if (response.status === 200 && jsonResponse.data) {
       const htmlBody = jsonResponse.result
 
       // Reemplazar el contenido de la página actual con el HTML recibido
@@ -39,7 +39,9 @@ async function handleMerchantRedirect(tokenInfo: any) {
       document.close(); // Cierra el documento para renderizar el nuevo contenido
     }
     else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Error on merchant redirect', life: 10000 })
+      console.log(jsonResponse)
+      const errorMessage = jsonResponse.data?.error?.errorMessage || 'Error on merchant redirect'
+      toast.add({ severity: 'error', summary: 'Error', detail: errorMessage, life: 10000 })
     }
   }
   finally {
@@ -69,6 +71,7 @@ onMounted(() => {
         </div>
       </template>
     </Card>
+    <Toast />
   </div>
 </template>
 
