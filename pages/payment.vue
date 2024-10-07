@@ -30,7 +30,7 @@ async function handleMerchantRedirect(tokenInfo: any) {
     })
     // console.log(response)
     const jsonResponse = await response.json()
-    if (response.status === 200 && jsonResponse.data) {
+    if (response.status === 200) {
       const htmlBody = jsonResponse.result
 
       // Reemplazar el contenido de la página actual con el HTML recibido
@@ -41,7 +41,7 @@ async function handleMerchantRedirect(tokenInfo: any) {
     else {
       console.log(jsonResponse)
       const errorMessage = jsonResponse.data?.error?.errorMessage || 'Error on merchant redirect'
-      toast.add({ severity: 'error', summary: 'Error', detail: errorMessage, life: 10000 })
+      toast.add({ severity: 'error', summary: 'Error', detail: errorMessage, life: 0 })
     }
   }
   finally {
