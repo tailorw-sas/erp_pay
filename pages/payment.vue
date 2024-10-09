@@ -5,6 +5,7 @@ const isLoading = ref(false) // Nuevo estado de carga
 
 const route = useRoute()
 const toast = useToast()
+const { $customFetch } = useNuxtApp()
 
 function disableBackNavigation() {
   history.pushState(null, document.title, location.href)
@@ -21,28 +22,23 @@ async function handleMerchantRedirect(tokenInfo: any) {
     token: tokenInfo,
   }
   try {
-    const response: any = await fetch('/api/redirect-to-merchant', {
+    const response: any = await $customFetch('/api/redirect-to-merchant', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
     })
-    // console.log(response)
-    const jsonResponse = await response.json()
-    if (response.status === 200) {
-      const htmlBody = jsonResponse.result
+    const htmlBody = response.result
 
-      // Reemplazar el contenido de la página actual con el HTML recibido
-      document.open(); // Abre el documento actual para escribir en él
-      document.write(await htmlBody); // Escribe el contenido nuevo
-      document.close(); // Cierra el documento para renderizar el nuevo contenido
-    }
-    else {
-      console.log(jsonResponse)
-      const errorMessage = jsonResponse.data?.error?.errorMessage || 'Error on merchant redirect'
-      toast.add({ severity: 'error', summary: 'Error', detail: errorMessage, life: 0 })
-    }
+    // Reemplazar el contenido de la página actual con el HTML recibido
+    document.open(); // Abre el documento actual para escribir en él
+    document.write(await htmlBody); // Escribe el contenido nuevo
+    document.close(); // Cierra el documento para renderizar el nuevo contenido
+  }
+  catch (error: any) {
+    const errorMessage = error.data.data.error.errorMessage || 'Error on merchant redirect'
+    toast.add({ severity: 'error', summary: 'Error', detail: errorMessage, life: 0 })
   }
   finally {
     isLoading.value = false
