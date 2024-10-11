@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import {type LocationQuery, useRoute, useRouter} from 'vue-router'
 import dayjs from 'dayjs'
+import { ITransactionDetailCardNet } from '~/components/interfaces/ITransactionDetail';
+import TransactionDetailsCardnet from "~/components/transaction-result/transaction-details-cardnet.vue";
 
 const isLoading = ref(true) // Nuevo estado de carga
 const transactionStatus = ref<string>('')
@@ -15,41 +17,75 @@ const isoCode = ref<string | null>('')
 const rrn = ref<string | null>('')
 const cardNumber = ref<string | null>('')
 const showDetails = ref(false)
+const isCardNet = ref(false)
 
 const route = useRoute()
 const router = useRouter()
+const { $customFetch } = useNuxtApp()
+const toast = useToast()
+const transactionDetailCardNet = ref<ITransactionDetailCardNet>({
+  cardNumber: ''
+})
 
-function disableBackNavigation() {
-  history.pushState(null, document.title, location.href)
-  history.back()
-  history.forward()
-  window.onpopstate = function () {
-    history.go(1)
+async function updateTransactionStatus(routeQuery: LocationQuery) {
+  if (isCardNet.value) { //CardNet
+    await updateCardNetTransaction(routeQuery.session)
   }
+}
+
+async function updateCardNetTransaction(sessionData: any) {
+  isLoading.value = true
+  const data = {
+    session: sessionData,
+  }
+  try {
+    const response: any = await $customFetch('/api/update-cardnet-transaction-status', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+    const result = response.result
+    transactionDetailCardNet.value.orderID = result.OrdenID
+    transactionDetailCardNet.value.authorizationCode = result.AuthorizationCode
+    transactionDetailCardNet.value.txToken = result.TxToken
+    transactionDetailCardNet.value.responseCode = result.ResponseCode
+    transactionDetailCardNet.value.cardNumber = result.CreditcardNumber
+    transactionDetailCardNet.value.retrievalReferenceNumber = result.RetrivalReferenceNumber
+    transactionDetailCardNet.value.remoteResponseCode = result.RemoteResponseCode
+    transactionDetailCardNet.value.transactionID = result.TransactionID
+  }
+  catch (error: any) {
+    const errorMessage = error.data.data.error.errorMessage || 'Error on merchant redirect'
+    toast.add({ severity: 'error', summary: 'Error', detail: errorMessage, life: 0 })
+  }
+  finally {
+    isLoading.value = false
+  }
+
 }
 
 onMounted(() => {
   // disableBackNavigation()
 
   const status = route.query.status || 'error'
+  isCardNet.value = route.query.session !== ''
+  updateTransactionStatus(route.query)
 
   transactionStatus.value = String(status) // Asignar el estado recibido a transactionStatus
-  orderNumber.value = String(route.query.OrderNumber) || ''
-  amount.value = (Number.parseFloat(String(route.query.Amount)) / 100).toFixed(2) || '0.00'
-  itbis.value = (Number.parseFloat(String(route.query.Itbis)) / 100).toFixed(2) || '0.00'
-  authorizationCode.value = String(route.query.AuthorizationCode) || ''
-  dateTime.value = dayjs(String(route.query.DateTime), 'YYYYMMDDHHmmss').format('YYYY/MM/DD HH:mm') || ''
-  responseMessage.value = String(route.query.ResponseMessage) || ''
-  isoCode.value = String(route.query.IsoCode) || ''
-  rrn.value = String(route.query.RRN) || ''
-  cardNumber.value = String(route.query.CardNumber) || ''
+  // orderNumber.value = String(route.query.OrderNumber) || ''
+  // amount.value = (Number.parseFloat(String(route.query.Amount)) / 100).toFixed(2) || '0.00'
+  // itbis.value = (Number.parseFloat(String(route.query.Itbis)) / 100).toFixed(2) || '0.00'
+  // authorizationCode.value = String(route.query.AuthorizationCode) || ''
+  // dateTime.value = dayjs(String(route.query.DateTime), 'YYYYMMDDHHmmss').format('YYYY/MM/DD HH:mm') || ''
+  // responseMessage.value = String(route.query.ResponseMessage) || ''
+  // isoCode.value = String(route.query.IsoCode) || ''
+  // rrn.value = String(route.query.RRN) || ''
+  // cardNumber.value = String(route.query.CardNumber) || ''
 
   isLoading.value = false // Los datos han sido cargados
 })
-
-function goHome() {
-  router.push('/vcc-management')
-}
 
 function toggleDetails() {
   showDetails.value = !showDetails.value
@@ -94,7 +130,8 @@ function toggleDetails() {
                   v-if="transactionStatus === 'success' || transactionStatus === 'declined'"/>
         </div>
         <div v-if="showDetails" class="details-card">
-          <Card class="" style="background-color: #fff">
+          <TransactionDetailsCardnet v-if="isCardNet" :transaction-detail="transactionDetailCardNet" />
+          <Card v-else class="" style="background-color: #fff">
             <template #content>
               <h4 class="text-center">
                 Transaction Details:
