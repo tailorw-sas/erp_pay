@@ -8,6 +8,7 @@ export interface ITransactionDetailAzul {
     isoCode?: string
     cardNumber: string
     rrn?: string
+    errorDescription?: string
 }
 
 export interface ITransactionDetailCardNet {
@@ -19,4 +20,10 @@ export interface ITransactionDetailCardNet {
     retrievalReferenceNumber?: string
     remoteResponseCode?: string
     transactionID?: string
+}
+
+export interface IUpdateTransactionStatusAzul {
+    orderNumber?: string
+    cardNumber?: string
+    merchantResponse?: string
 }

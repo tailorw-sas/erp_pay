@@ -7,18 +7,20 @@ export default defineEventHandler(async (event) => {
   const secToken = await getToken({ event })
 
   const {
-    session,
+    orderNumber, cardNumber, merchantResponse
   } = body
 
   const payload: { [key: string]: any } = {}
-  payload.session = session
+  payload.orderNumber = orderNumber
+  payload.cardNumber = cardNumber
+  payload.merchantResponse = merchantResponse
 
   const defaultHeaders: HeadersInit = {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${secToken?.access_token}`,
   }
 
-  const response = await $fetch(`${process.env.VITE_APP_BASE_URL}/creditcard/api/transactions/processMerchantCardNetResponse`, {
+  const response = await $fetch(`${process.env.VITE_APP_BASE_URL}/creditcard/api/transactions/processMerchantBlueResponse`, {
     method: 'POST',
     body: payload,
     headers: defaultHeaders
