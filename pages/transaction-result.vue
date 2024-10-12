@@ -4,7 +4,7 @@ import {type LocationQuery, useRoute, useRouter} from 'vue-router'
 import dayjs from 'dayjs'
 import {
   type ITransactionDetailAzul,
-  ITransactionDetailCardNet,
+  type ITransactionDetailCardNet,
   type IUpdateTransactionStatusAzul
 } from '~/components/interfaces/ITransactionDetail';
 import TransactionDetailsCardnet from "~/components/transaction-result/transaction-details-cardnet.vue";
@@ -12,15 +12,6 @@ import TransactionDetailsAzul from "~/components/transaction-result/transaction-
 
 const isLoading = ref(true) // Nuevo estado de carga
 const transactionStatus = ref<string>('')
-const orderNumber = ref<string>('')
-const amount = ref<string>('')
-const itbis = ref<string | null>('')
-const authorizationCode = ref<string | null>('')
-const dateTime = ref<string | null>('')
-const responseMessage = ref<string | null>('')
-const isoCode = ref<string | null>('')
-const rrn = ref<string | null>('')
-const cardNumber = ref<string | null>('')
 const showDetails = ref(false)
 const isCardNet = ref(false)
 
@@ -134,16 +125,6 @@ onMounted(() => {
   updateTransactionStatus(route.query)
 
   transactionStatus.value = String(status) // Asignar el estado recibido a transactionStatus
-  // orderNumber.value = String(route.query.OrderNumber) || ''
-  // amount.value = (Number.parseFloat(String(route.query.Amount)) / 100).toFixed(2) || '0.00'
-  // itbis.value = (Number.parseFloat(String(route.query.Itbis)) / 100).toFixed(2) || '0.00'
-  // authorizationCode.value = String(route.query.AuthorizationCode) || ''
-  // dateTime.value = dayjs(String(route.query.DateTime), 'YYYYMMDDHHmmss').format('YYYY/MM/DD HH:mm') || ''
-  // responseMessage.value = String(route.query.ResponseMessage) || ''
-  // isoCode.value = String(route.query.IsoCode) || ''
-  // rrn.value = String(route.query.RRN) || ''
-  // cardNumber.value = String(route.query.CardNumber) || ''
-
   isLoading.value = false // Los datos han sido cargados
 })
 
