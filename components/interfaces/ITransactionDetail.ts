@@ -23,7 +23,9 @@ export interface ITransactionDetailCardNet {
 }
 
 export interface IUpdateTransactionStatusAzul {
-    orderNumber?: string
-    cardNumber?: string
-    merchantResponse?: string
+    orderNumber: string
+    cardNumber: string
+    merchantResponse: string
+    isoCode: string
+    status: string
 }
