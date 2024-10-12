@@ -32,15 +32,20 @@ async function updateTransactionStatus(routeQuery: LocationQuery) {
   if (isCardNet.value) { //CardNet
     await updateCardNetTransaction(routeQuery.session)
   } else {
-    const url = route.fullPath
-    const startIndex = url.indexOf('OrderNumber');
-    const substringFromOrderNumber = url.substring(startIndex);
-    const data: IUpdateTransactionStatusAzul = {
-      orderNumber: String(routeQuery.OrderNumber) || '',
-      cardNumber: String(routeQuery.CardNumber) || '',
-      merchantResponse: substringFromOrderNumber
+    const status = String(routeQuery.status || '').toUpperCase()
+      if (status === 'SUCCESS' || status === 'DECLINED') {
+      const url = route.fullPath
+      const startIndex = url.indexOf('OrderNumber');
+      const substringFromOrderNumber = (startIndex > 0) ? url.substring(startIndex) : '';
+      const data: IUpdateTransactionStatusAzul = {
+        orderNumber: String(routeQuery.OrderNumber || ''),
+        cardNumber: String(routeQuery.CardNumber || ''),
+        merchantResponse: substringFromOrderNumber,
+        isoCode: String(routeQuery.IsoCode || ''),
+        status: status
+      }
+      await updateAzulTransaction(data, routeQuery)
     }
-    await updateAzulTransaction(data, routeQuery)
   }
 }
 
@@ -117,8 +122,6 @@ async function updateAzulTransaction(data: IUpdateTransactionStatusAzul, routeQu
 }
 
 onMounted(() => {
-  // disableBackNavigation()
-
   const status = route.query.status || 'error'
   isCardNet.value = route.query.session !== null && route.query.session !== undefined
   console.log(isCardNet.value)
