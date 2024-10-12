@@ -2,8 +2,13 @@
 import { onMounted, ref } from 'vue'
 import {type LocationQuery, useRoute, useRouter} from 'vue-router'
 import dayjs from 'dayjs'
-import { ITransactionDetailCardNet } from '~/components/interfaces/ITransactionDetail';
+import {
+  type ITransactionDetailAzul,
+  ITransactionDetailCardNet,
+  type IUpdateTransactionStatusAzul
+} from '~/components/interfaces/ITransactionDetail';
 import TransactionDetailsCardnet from "~/components/transaction-result/transaction-details-cardnet.vue";
+import TransactionDetailsAzul from "~/components/transaction-result/transaction-details-azul.vue";
 
 const isLoading = ref(true) // Nuevo estado de carga
 const transactionStatus = ref<string>('')
@@ -26,10 +31,25 @@ const toast = useToast()
 const transactionDetailCardNet = ref<ITransactionDetailCardNet>({
   cardNumber: ''
 })
+const transactionDetailAzul = ref<ITransactionDetailAzul>({
+  orderNumber: '',
+  cardNumber: '',
+  amount: ''
+})
 
 async function updateTransactionStatus(routeQuery: LocationQuery) {
   if (isCardNet.value) { //CardNet
     await updateCardNetTransaction(routeQuery.session)
+  } else {
+    const url = route.fullPath
+    const startIndex = url.indexOf('OrderNumber');
+    const substringFromOrderNumber = url.substring(startIndex);
+    const data: IUpdateTransactionStatusAzul = {
+      orderNumber: String(routeQuery.OrderNumber) || '',
+      cardNumber: String(routeQuery.CardNumber) || '',
+      merchantResponse: substringFromOrderNumber
+    }
+    await updateAzulTransaction(data, routeQuery)
   }
 }
 
@@ -47,14 +67,53 @@ async function updateCardNetTransaction(sessionData: any) {
       body: JSON.stringify(data),
     })
     const result = response.result
-    transactionDetailCardNet.value.orderID = result.OrdenID
-    transactionDetailCardNet.value.authorizationCode = result.AuthorizationCode
-    transactionDetailCardNet.value.txToken = result.TxToken
-    transactionDetailCardNet.value.responseCode = result.ResponseCode
-    transactionDetailCardNet.value.cardNumber = result.CreditcardNumber
-    transactionDetailCardNet.value.retrievalReferenceNumber = result.RetrivalReferenceNumber
-    transactionDetailCardNet.value.remoteResponseCode = result.RemoteResponseCode
-    transactionDetailCardNet.value.transactionID = result.TransactionID
+    const cardNetResponse: ITransactionDetailCardNet = {
+      orderID: result.OrdenID,
+      authorizationCode: result.AuthorizationCode,
+      txToken: result.TxToken,
+      responseCode: result.ResponseCode,
+      cardNumber: result.CreditcardNumber,
+      retrievalReferenceNumber: result.RetrivalReferenceNumber,
+      remoteResponseCode: result.RemoteResponseCode,
+      transactionID: result.TransactionID
+    }
+    transactionDetailCardNet.value = cardNetResponse
+  }
+  catch (error: any) {
+    const errorMessage = error.data.data.error.errorMessage || 'Error on merchant redirect'
+    toast.add({ severity: 'error', summary: 'Error', detail: errorMessage, life: 0 })
+  }
+  finally {
+    isLoading.value = false
+  }
+
+}
+
+async function updateAzulTransaction(data: IUpdateTransactionStatusAzul, routeQuery: LocationQuery) {
+  isLoading.value = true
+
+  try {
+    const response: any = await $customFetch('/api/update-azul-transaction-status', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+    const result = response.result
+    const azulResponse: ITransactionDetailAzul = {
+      amount: (Number.parseFloat(String(routeQuery.Amount)) / 100).toFixed(2) || '0.00',
+      orderNumber: String(routeQuery.OrderNumber) || '',
+      cardNumber: String(routeQuery.CardNumber) || '',
+      rrn: String(routeQuery.RRN) || '',
+      authorizationCode: String(routeQuery.AuthorizationCode) || '',
+      errorDescription: String(routeQuery.ErrorDescription) || '',
+      dateTime: dayjs(String(routeQuery.DateTime), 'YYYYMMDDHHmmss').format('YYYY/MM/DD HH:mm') || '',
+      isoCode: String(routeQuery.IsoCode) || '',
+      responseMessage: String(routeQuery.ResponseMessage) || '',
+      itbis: (Number.parseFloat(String(routeQuery.Itbis)) / 100).toFixed(2) || '0.00'
+    }
+    transactionDetailAzul.value = azulResponse
   }
   catch (error: any) {
     const errorMessage = error.data.data.error.errorMessage || 'Error on merchant redirect'
@@ -70,7 +129,8 @@ onMounted(() => {
   // disableBackNavigation()
 
   const status = route.query.status || 'error'
-  isCardNet.value = route.query.session !== ''
+  isCardNet.value = route.query.session !== null && route.query.session !== undefined
+  console.log(isCardNet.value)
   updateTransactionStatus(route.query)
 
   transactionStatus.value = String(status) // Asignar el estado recibido a transactionStatus
@@ -131,23 +191,7 @@ function toggleDetails() {
         </div>
         <div v-if="showDetails" class="details-card">
           <TransactionDetailsCardnet v-if="isCardNet" :transaction-detail="transactionDetailCardNet" />
-          <Card v-else class="" style="background-color: #fff">
-            <template #content>
-              <h4 class="text-center">
-                Transaction Details:
-              </h4>
-              <Divider />
-              <p><strong>Order Number:</strong> {{ route.query.OrderNumber }}</p>
-              <p><strong>Amount:</strong> {{ amount }}</p>
-              <p><strong>ITBIS:</strong> {{ itbis }}</p>
-              <p><strong>Authorization Code:</strong> {{ route.query.AuthorizationCode }}</p>
-              <p><strong>Date and Time:</strong> {{ dateTime }}</p>
-              <p><strong>Merchant Response:</strong> {{ route.query.ResponseMessage }} ({{ route.query.IsoCode }})</p>
-              <p v-if="transactionStatus === 'declined' || transactionStatus === 'cancelled'"><strong>Error Description:</strong> {{ route.query.ErrorDescription }}</p>
-              <p><strong>Reference Number:</strong> {{ route.query.RRN }}</p>
-              <p><strong>Card Number:</strong> {{ route.query.CardNumber }}</p>
-            </template>
-          </Card>
+          <TransactionDetailsAzul v-else :transaction-detail="transactionDetailAzul" />
         </div>
       </template>
     </Card>
