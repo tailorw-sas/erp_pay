@@ -3,6 +3,10 @@ import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 const isLoading = ref(false) // Nuevo estado de carga
 
+useHead({
+  title: 'Processing transaction',
+});
+
 const route = useRoute()
 const toast = useToast()
 const { $customFetch } = useNuxtApp()

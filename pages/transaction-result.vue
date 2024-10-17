@@ -10,6 +10,10 @@ import {
 import TransactionDetailsCardnet from "~/components/transaction-result/transaction-details-cardnet.vue";
 import TransactionDetailsAzul from "~/components/transaction-result/transaction-details-azul.vue";
 
+useHead({
+  title: 'Transaction result',
+});
+
 enum ENUM_TRANSACTION_STATUS {
   SUCCESS = 'success',
   DECLINED = 'declined',
