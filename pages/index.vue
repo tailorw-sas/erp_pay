@@ -207,15 +207,15 @@ html, body, #__nuxt, .layout-container {
 
 @media (min-width: 1281px) { /* xxl */
   .title-home {
-    font-size: 2rem; /* Ajusta el tamaño del texto */
+    font-size: 1.7rem; /* Ajusta el tamaño del texto */
   }
 
   .text-5xl {
-    font-size: 2.5rem; /* Ajusta el tamaño del texto */
+    font-size: 1.7rem; /* Ajusta el tamaño del texto */
   }
 
   .container-title {
-    font-size: 2rem; /* Ajusta el tamaño del texto */
+    font-size: 1.7rem; /* Ajusta el tamaño del texto */
   }
 }
 </style>
