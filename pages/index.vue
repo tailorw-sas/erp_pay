@@ -3,6 +3,7 @@ definePageMeta({
   layout: 'empty'
 })
 useHead({
+  title: 'Home',
   link: [
     {
       rel: 'stylesheet',
