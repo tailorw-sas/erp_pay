@@ -65,7 +65,8 @@ async function updateTransactionStatus(routeQuery: LocationQuery) {
         cardNumber: String(routeQuery.CardNumber || ''),
         merchantResponse: substringFromOrderNumber,
         isoCode: String(routeQuery.IsoCode || ''),
-        status: status
+        status: status,
+        paymentDate: dayjs(String(routeQuery.DateTime), 'YYYYMMDDHHmmss').format('YYYY-MM-DDTHH:mm:ss') || ''
       }
       await updateAzulTransaction(data, routeQuery)
     }

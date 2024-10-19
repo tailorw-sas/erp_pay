@@ -27,5 +27,6 @@ export interface IUpdateTransactionStatusAzul {
     cardNumber: string
     merchantResponse: string
     isoCode: string
-    status: string
+    status: string,
+    paymentDate: string
 }
