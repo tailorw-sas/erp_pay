@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
   const secToken = await getToken({ event })
 
   const {
-    orderNumber, cardNumber, merchantResponse, isoCode, status
+    orderNumber, cardNumber, merchantResponse, isoCode, status, paymentDate
   } = body
 
   const payload: { [key: string]: any } = {}
@@ -16,6 +16,7 @@ export default defineEventHandler(async (event) => {
   payload.merchantResponse = merchantResponse
   payload.isoCode = isoCode
   payload.status = status
+  payload.paymentDate = paymentDate
 
   const defaultHeaders: HeadersInit = {
     'Content-Type': 'application/json',
