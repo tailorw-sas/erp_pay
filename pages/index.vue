@@ -94,7 +94,6 @@ html, body, #__nuxt, .layout-container {
 
 .container-home-title {
   margin-top: 20px;
-  width: 58%;
   opacity: 0.9;
 }
 
@@ -147,7 +146,7 @@ html, body, #__nuxt, .layout-container {
 }
 
 @media (min-width: 641px) and (max-width: 768px) { /* md */
-  container-home-title {
+  .container-home-title {
     width: 100%;
   }
 
@@ -165,8 +164,8 @@ html, body, #__nuxt, .layout-container {
 }
 
 @media (min-width: 769px) and (max-width: 1024px) { /* lg */
-  container-home-title {
-    width: 100%;
+  .container-home-title {
+    width: 80%;
   }
 
   .bar-center {
@@ -192,6 +191,9 @@ html, body, #__nuxt, .layout-container {
 }
 
 @media (min-width: 1025px) and (max-width: 1280px) { /* xl */
+  .container-home-title {
+    width: 65%;
+  }
   .title-home {
     font-size: 1.7rem; /* Ajusta el tamaño del texto */
   }
@@ -206,6 +208,10 @@ html, body, #__nuxt, .layout-container {
 }
 
 @media (min-width: 1281px) { /* xxl */
+  .container-home-title {
+    width: 45%;
+  }
+
   .title-home {
     font-size: 1.7rem; /* Ajusta el tamaño del texto */
   }
