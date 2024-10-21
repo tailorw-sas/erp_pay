@@ -209,7 +209,7 @@ html, body, #__nuxt, .layout-container {
 
 @media (min-width: 1281px) { /* xxl */
   .container-home-title {
-    width: 40%;
+    width: 45%;
   }
 
   .title-home {
