@@ -126,19 +126,23 @@ async function updateAzulTransaction(data: IUpdateTransactionStatusAzul, routeQu
       body: JSON.stringify(data),
     })
     const result = response.result
+    const errorMessage = String(routeQuery.ErrorDescription)
     const azulResponse: ITransactionDetailAzul = {
       amount: (Number.parseFloat(String(routeQuery.Amount)) / 100).toFixed(2) || '0.00',
       orderNumber: String(routeQuery.OrderNumber) || '',
       cardNumber: String(routeQuery.CardNumber) || '',
       rrn: String(routeQuery.RRN) || '',
       authorizationCode: String(routeQuery.AuthorizationCode) || '',
-      errorDescription: String(routeQuery.ErrorDescription) || '',
+      errorDescription: errorMessage,
       dateTime: dayjs(String(routeQuery.DateTime), 'YYYYMMDDHHmmss').format('YYYY/MM/DD HH:mm') || '',
       isoCode: String(routeQuery.IsoCode) || '',
       responseMessage: String(routeQuery.ResponseMessage) || '',
       itbis: (Number.parseFloat(String(routeQuery.Itbis)) / 100).toFixed(2) || '0.00'
     }
     transactionDetailAzul.value = azulResponse
+    if (errorMessage) {
+      transactionStatusMessage.value = errorMessage
+    }
   } catch (error: any) {
     errorMessage.value = error.data.data.error.errorMessage || 'Error on merchant redirect'
     errorOccurred.value = true
@@ -203,10 +207,10 @@ function toggleDetails() {
                         : 'Transaction Cancelled'
               }}
             </h2>
-            <p>{{transactionStatusMessage}}</p>
+            <p class="text-center">{{transactionStatusMessage}}</p>
           </div>
           <Button label="Show Details" icon="pi pi-chevron-down" style="margin-right: 2px;" @click="toggleDetails"
-                  v-if="transactionStatus === 'success' || transactionStatus === 'declined'"/>
+                  v-if="transactionStatus === ENUM_TRANSACTION_STATUS.SUCCESS || transactionStatus === ENUM_TRANSACTION_STATUS.DECLINED"/>
         </div>
         <div v-if="showDetails" class="details-card">
           <TransactionDetailsCardnet v-if="isCardNet" :transaction-detail="transactionDetailCardNet"/>
