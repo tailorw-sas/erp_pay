@@ -21,6 +21,8 @@ enum ENUM_TRANSACTION_STATUS {
 }
 
 const isLoading = ref(true) // Nuevo estado de carga
+const errorOccurred = ref(false) // Si ocurre algun error en el api
+const errorMessage = ref('')
 const transactionStatus = ref<ENUM_TRANSACTION_STATUS>()
 const transactionStatusMessage = ref<string>('')
 const showDetails = ref(false)
@@ -103,8 +105,9 @@ async function updateCardNetTransaction(sessionData: any) {
       transactionStatusMessage.value = result.merchantStatus.description
     }
   } catch (error: any) {
-    const errorMessage = error.data.data.error.errorMessage || 'Error on merchant redirect'
-    toast.add({severity: 'error', summary: 'Error', detail: errorMessage, life: 0})
+    errorMessage.value = error.data.data.error.errorMessage || 'Error on merchant redirect'
+    errorOccurred.value = true
+    // toast.add({severity: 'error', summary: 'Error', detail: errorMessage, life: 0})
   } finally {
     isLoading.value = false
   }
@@ -137,8 +140,9 @@ async function updateAzulTransaction(data: IUpdateTransactionStatusAzul, routeQu
     }
     transactionDetailAzul.value = azulResponse
   } catch (error: any) {
-    const errorMessage = error.data.data.error.errorMessage || 'Error on merchant redirect'
-    toast.add({severity: 'error', summary: 'Error', detail: errorMessage, life: 0})
+    errorMessage.value = error.data.data.error.errorMessage || 'Error on merchant redirect'
+    errorOccurred.value = true
+    // toast.add({severity: 'error', summary: 'Error', detail: errorMessage, life: 0})
   } finally {
     isLoading.value = false
   }
@@ -168,6 +172,17 @@ function toggleDetails() {
           <p class="loading-text">
             Processing your transaction, please wait...
           </p>
+        </div>
+      </template>
+    </Card>
+    <Card v-else-if="errorOccurred" class="card card-bg-color" style="width: 500px">
+      <template #content>
+        <div class="flex flex-column align-items-center">
+          <div class="flex flex-column align-items-center">
+            <i class="pi pi-times-circle mt-2 mb-2" style="font-size: 4rem; color: red;"/>
+            <h2 class="mt-2 mb-2">Error Occurred</h2>
+            <p class="mt-2 mb-2">{{errorMessage}}</p>
+          </div>
         </div>
       </template>
     </Card>
