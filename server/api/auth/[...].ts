@@ -82,6 +82,8 @@ async function autoLogin() {
   };
 }
 
+let isAttemptingAutoLogin = false // Control global para evitar múltiples autoLogin
+
 export default NuxtAuthHandler({
   secret: process.env.AUTH_SECRET,
   providers: [
@@ -115,14 +117,37 @@ export default NuxtAuthHandler({
       }
 
       // Handle token refresh before it expires of 15 minutes
-      if (token.refreshTokenExpires && Date.now() > (token as any).refreshTokenExpires) {
+      /*if (token.refreshTokenExpires && Date.now() > (token as any).refreshTokenExpires) {
         console.error('Refresh token expired')
-        // TODO: Add refresh token logic
         return null
       }
 
       if (token.accessTokenExpires && Date.now() > (token as any).accessTokenExpires) {
         return refreshAccessToken(token)
+      }*/
+
+      // Si el access_token está por expirar, intentamos refrescar
+      if (token.accessTokenExpires && Date.now() > (token as any).accessTokenExpires - 60 * 1000) {
+        console.debug('Access token expiring. Attempting to refresh...')
+        const refreshedToken = await refreshAccessToken(token)
+        if (refreshedToken.error) {
+          console.error('Token refresh failed:', refreshedToken.error)
+          if (!isAttemptingAutoLogin) {
+            isAttemptingAutoLogin = true
+            try {
+              const newToken = await autoLogin() // Intentamos restaurar sesión
+              isAttemptingAutoLogin = false
+              return newToken
+            }
+            catch (error) {
+              console.error('AutoLogin failed:', error)
+              isAttemptingAutoLogin = false
+              return null // Forzar logout
+            }
+          }
+          return null
+        }
+        return refreshedToken
       }
 
       return token
