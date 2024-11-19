@@ -105,7 +105,7 @@ async function updateCardNetTransaction(sessionData: any) {
       transactionStatusMessage.value = result.merchantStatus.description
     }
   } catch (error: any) {
-    errorMessage.value = error.data.data.error.errorMessage || 'Error on merchant redirect'
+    errorMessage.value = error.data?.data?.error?.errorMessage || 'Error on payment confirmation, please try again'
     errorOccurred.value = true
     // toast.add({severity: 'error', summary: 'Error', detail: errorMessage, life: 0})
   } finally {
