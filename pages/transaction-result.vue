@@ -71,6 +71,9 @@ async function updateTransactionStatus(routeQuery: LocationQuery) {
         paymentDate: dayjs(String(routeQuery.DateTime), 'YYYYMMDDHHmmss').format('YYYY-MM-DDTHH:mm:ss') || ''
       }
       await updateAzulTransaction(data, routeQuery)
+    } else {
+      // Deshabilitar pantalla de carga si es cancelled
+      isLoading.value = false
     }
   }
 }
