@@ -20,6 +20,7 @@ enum ENUM_TRANSACTION_STATUS {
   CANCELLED = 'cancelled',
 }
 
+const { data: userData } = useAuth()
 const isLoading = ref(true) // Nuevo estado de carga
 const errorOccurred = ref(false) // Si ocurre algun error en el api
 const errorMessage = ref('')
@@ -68,7 +69,9 @@ async function updateTransactionStatus(routeQuery: LocationQuery) {
         merchantResponse: substringFromOrderNumber,
         isoCode: String(routeQuery.IsoCode || ''),
         status: status,
-        paymentDate: dayjs(String(routeQuery.DateTime), 'YYYYMMDDHHmmss').format('YYYY-MM-DDTHH:mm:ss') || ''
+        paymentDate: dayjs(String(routeQuery.DateTime), 'YYYYMMDDHHmmss').format('YYYY-MM-DDTHH:mm:ss') || '',
+        employee: userData?.value?.user?.name,
+        employeeId: userData?.value?.user?.userId,
       }
       await updateAzulTransaction(data, routeQuery)
     } else {
@@ -82,6 +85,8 @@ async function updateCardNetTransaction(sessionData: any) {
   isLoading.value = true
   const data = {
     session: sessionData,
+    employee: userData?.value?.user?.name,
+    employeeId: userData?.value?.user?.userId,
   }
   try {
     const response: any = await $customFetch('/api/update-cardnet-transaction-status', {
