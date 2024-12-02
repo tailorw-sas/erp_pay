@@ -7,11 +7,13 @@ export default defineEventHandler(async (event) => {
   const secToken = await getToken({ event })
 
   const {
-    session,
+    session, employee, employeeId
   } = body
 
   const payload: { [key: string]: any } = {}
   payload.session = session
+  payload.employee = employee
+  payload.employeeId = employeeId
 
   const defaultHeaders: HeadersInit = {
     'Content-Type': 'application/json',
