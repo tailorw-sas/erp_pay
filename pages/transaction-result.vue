@@ -71,7 +71,6 @@ async function updateTransactionStatus(routeQuery: LocationQuery) {
         status: status,
         paymentDate: dayjs(String(routeQuery.DateTime), 'YYYYMMDDHHmmss').format('YYYY-MM-DDTHH:mm:ss') || '',
         employee: userData?.value?.user?.name,
-        employeeId: userData?.value?.user?.userId,
       }
       await updateAzulTransaction(data, routeQuery)
     } else {
@@ -86,7 +85,6 @@ async function updateCardNetTransaction(sessionData: any) {
   const data = {
     session: sessionData,
     employee: userData?.value?.user?.name,
-    employeeId: userData?.value?.user?.userId,
   }
   try {
     const response: any = await $customFetch('/api/update-cardnet-transaction-status', {
