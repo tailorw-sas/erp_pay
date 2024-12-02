@@ -28,5 +28,7 @@ export interface IUpdateTransactionStatusAzul {
     merchantResponse: string
     isoCode: string
     status: string,
-    paymentDate: string
+    paymentDate: string,
+    employee?: string | null | undefined,
+    employeeId?: string | null | undefined,
 }
