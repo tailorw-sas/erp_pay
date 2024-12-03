@@ -158,7 +158,6 @@ function toggleDetails() {
 
 <template>
   <div class="transaction-result">
-    <pre>{{transactionStore.transactionData}}</pre>
     <Card v-if="isLoading" class="loading-card card-bg-color">
       <template #content>
         <div class="loading-container">

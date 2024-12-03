@@ -42,6 +42,7 @@ function getDefaultTransactionMessage() {
 async function loadTransactionResult() {
   try {
     isLoading.value = true
+    transactionStore.loadTransactionData() //cargar la data del localstorage
     transactionData.value = transactionStore.transactionData
     console.log(transactionData.value)
     isCardNet.value = transactionData.value?.isCardNet || false
@@ -69,7 +70,6 @@ function toggleDetails() {
 
 <template>
   <div class="transaction-result">
-    <pre>{{transactionStore.transactionData}}</pre>
     <Card v-if="isLoading" class="loading-card card-bg-color">
       <template #content>
         <div class="loading-container">
