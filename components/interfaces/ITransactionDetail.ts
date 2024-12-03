@@ -9,6 +9,9 @@ export interface ITransactionDetailAzul {
     cardNumber: string
     rrn?: string
     errorDescription?: string
+    isCardNet: boolean,
+    resultStatus: ENUM_TRANSACTION_STATUS,
+    resultMessage?: string
 }
 
 export interface ITransactionDetailCardNet {
@@ -19,7 +22,10 @@ export interface ITransactionDetailCardNet {
     responseCode?: string
     retrievalReferenceNumber?: string
     remoteResponseCode?: string
-    transactionID?: string
+    transactionID?: string,
+    isCardNet: boolean,
+    resultStatus: ENUM_TRANSACTION_STATUS,
+    resultMessage?: string
 }
 
 export interface IUpdateTransactionStatusAzul {
@@ -30,4 +36,10 @@ export interface IUpdateTransactionStatusAzul {
     status: string,
     paymentDate: string,
     employee?: string | null | undefined,
+}
+
+export enum ENUM_TRANSACTION_STATUS {
+    SUCCESS = 'success',
+    DECLINED = 'declined',
+    CANCELLED = 'cancelled',
 }

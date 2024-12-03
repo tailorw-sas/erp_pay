@@ -10,21 +10,23 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "dayjs": "^1.11.11",
+    "jwt-decode": "^4.0.0",
     "nuxt": "^3.13.0",
+    "pinia": "^2.2.8",
+    "@pinia/nuxt": "^0.5.1",
     "primeflex": "^3.3.1",
     "primeicons": "^7.0.0",
     "primevue": "^3.52.0",
     "sass-loader": "^16.0.2",
     "vue": "latest",
     "vue-router": "latest",
-    "dayjs": "^1.11.11",
-    "jwt-decode": "^4.0.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@sidebase/nuxt-auth": "^0.7.0",
     "nuxt-primevue": "^3.0.0",
-    "sass": "^1.77.2",
-    "@sidebase/nuxt-auth": "^0.7.0"
+    "sass": "^1.77.2"
   },
   "peerDependencies": {
     "next-auth": "4.21.1"

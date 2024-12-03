@@ -5,6 +5,7 @@ export default defineNuxtConfig({
   modules: [
     'nuxt-primevue',
     '@sidebase/nuxt-auth',
+    '@pinia/nuxt',
   ],
   auth: {
     globalAppMiddleware: {
