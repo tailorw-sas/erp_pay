@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
       delete body.SESSION
 
       // Realizamos la redirección sin volver a enviar la session en el cuerpo
-      return sendRedirect(event, `/process-transaction?status=success&session=${session}`)
+      return sendRedirect(event, `/process-transaction?status=success&session=${session}`, 301)
     }
   }
 })
