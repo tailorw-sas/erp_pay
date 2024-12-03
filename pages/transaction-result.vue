@@ -51,6 +51,8 @@ async function loadTransactionResult() {
     }
     if (transactionData.value?.resultMessage) {
       transactionStatusMessage.value = transactionData.value?.resultMessage
+    } else {
+      getDefaultTransactionMessage()
     }
   }
   finally {
@@ -59,7 +61,6 @@ async function loadTransactionResult() {
 }
 
 onMounted(() => {
-  getDefaultTransactionMessage()
   loadTransactionResult()
 })
 

@@ -90,7 +90,6 @@ async function updateCardNetTransaction(sessionData: any) {
     transactionStore.setTransactionData(cardNetResponse)
     navigateTo('/transaction-result', { replace: true })
   } catch (error: any) {
-    navigateTo('/transaction-result', { replace: true })
     errorMessage.value = error.data?.data?.error?.errorMessage || 'Error on payment confirmation, please try again'
     errorOccurred.value = true
     // toast.add({severity: 'error', summary: 'Error', detail: errorMessage, life: 0})
