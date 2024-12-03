@@ -19,7 +19,7 @@ const objTitle = ref({
 })
 </script>
 <template>
-  <div class="bg-home">
+  <div class="bg-home-2">
     <div style="height: 85vh;" class="flex flex-column align-items-center justify-content-end">
       <!-- TITLE -->
       <div class="text-center font-text container-home-title">
@@ -97,7 +97,7 @@ html, body, #__nuxt, .layout-container {
   opacity: 0.9;
 }
 
-.bg-home {
+.bg-home-2 {
   background-image: url('/layout/images/home.jpg');
   background-size: 100% 100%; /* Estira la imagen al 100% del ancho y alto */
   background-repeat: no-repeat;
