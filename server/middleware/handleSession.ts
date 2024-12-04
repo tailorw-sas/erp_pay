@@ -17,11 +17,7 @@ export default defineEventHandler(async (event) => {
       delete body.SESSION
 
       // Realizamos la redirección sin volver a enviar la session en el cuerpo
-      return sendRedirect(event, `/process-transaction?status=success&session=${session}`, 301)
+      return sendRedirect(event, `/process-transaction?status=success&session=${session}`)
     }
-  }
-  // redirect azul
-  if (reqUrl.includes('process-transaction') && reqUrl.includes('&OrderNumber')) {
-    return sendRedirect(event, reqUrl, 301)
   }
 })
