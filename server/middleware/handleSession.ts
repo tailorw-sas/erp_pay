@@ -20,6 +20,7 @@ export default defineEventHandler(async (event) => {
       return sendRedirect(event, `/process-transaction?status=success&session=${session}`, 301)
     }
   }
+  // redirect azul
   if (reqUrl.includes('process-transaction') && reqUrl.includes('&OrderNumber')) {
     return sendRedirect(event, reqUrl, 301)
   }
