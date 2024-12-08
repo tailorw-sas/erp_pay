@@ -44,7 +44,6 @@ async function loadTransactionResult() {
     isLoading.value = true
     transactionStore.loadTransactionData() //cargar la data del localstorage
     transactionData.value = transactionStore.transactionData
-    console.log(transactionData.value)
     isCardNet.value = transactionData.value?.isCardNet || false
     if (transactionData.value?.resultStatus) {
       transactionStatus.value = transactionData.value?.resultStatus
