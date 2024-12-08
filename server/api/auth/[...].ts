@@ -127,7 +127,7 @@ export default NuxtAuthHandler({
       }*/
 
       // Si el access_token está por expirar, intentamos refrescar
-      if (token.accessTokenExpires && Date.now() > (token as any).accessTokenExpires - 60 * 1000) {
+      if (token.accessTokenExpires && Date.now() > (token as any).accessTokenExpires) {
         console.debug('Access token expiring. Attempting to refresh...')
         const refreshedToken = await refreshAccessToken(token)
         if (refreshedToken.error) {
