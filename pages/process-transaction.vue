@@ -37,6 +37,7 @@ async function updateTransactionStatus(routeQuery: LocationQuery) {
       const url = route.fullPath
       const startIndex = url.indexOf('OrderNumber');
       const substringFromOrderNumber = (startIndex > 0) ? url.substring(startIndex) : '';
+      const responseCodeMessage = `${routeQuery.IsoCode}, ${routeQuery.ResponseMessage}${routeQuery.ErrorDescription ? `: ${routeQuery.ErrorDescription}` : ''}`
       const data: IUpdateTransactionStatusAzul = {
         orderNumber: String(routeQuery.OrderNumber || ''),
         cardNumber: String(routeQuery.CardNumber || ''),
@@ -45,6 +46,7 @@ async function updateTransactionStatus(routeQuery: LocationQuery) {
         status: status,
         paymentDate: dayjs(String(routeQuery.DateTime), 'YYYYMMDDHHmmss').format('YYYY-MM-DDTHH:mm:ss') || '',
         employee: userData?.value?.user?.name || 'Anonymous',
+        responseCodeMessage: responseCodeMessage
       }
       await updateAzulTransaction(data, routeQuery)
     } else {
