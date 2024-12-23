@@ -36,6 +36,7 @@ export interface IUpdateTransactionStatusAzul {
     status: string,
     paymentDate: string,
     employee?: string | null | undefined,
+    employeeId?: string | null | undefined,
     responseCodeMessage: string
 }
 
