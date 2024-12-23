@@ -15,7 +15,7 @@ useHead({
 });
 
 const transactionStore = useTransactionStore()
-const { data: userData } = useAuth()
+const { userData } = useAuthStore()
 const isLoading = ref(true) // Nuevo estado de carga
 const errorOccurred = ref(false) // Si ocurre algun error en el api
 const errorMessage = ref('')
@@ -25,7 +25,6 @@ const showDetails = ref(false)
 const isCardNet = ref(false)
 
 const route = useRoute()
-const router = useRouter()
 const {$customFetch} = useNuxtApp()
 
 async function updateTransactionStatus(routeQuery: LocationQuery) {
@@ -45,8 +44,8 @@ async function updateTransactionStatus(routeQuery: LocationQuery) {
         isoCode: String(routeQuery.IsoCode || ''),
         status: status,
         paymentDate: dayjs(String(routeQuery.DateTime), 'YYYYMMDDHHmmss').format('YYYY-MM-DDTHH:mm:ss') || '',
-        employee: userData?.value?.user?.name || 'Anonymous',
-        employeeId: userData?.value?.user?.userId,
+        employee: userData?.data?.name || 'Anonymous',
+        employeeId: userData?.data?.userId,
         responseCodeMessage: responseCodeMessage
       }
       await updateAzulTransaction(data, routeQuery)
@@ -61,8 +60,8 @@ async function updateCardNetTransaction(sessionData: any) {
   isLoading.value = true
   const data = {
     session: sessionData,
-    employee: userData?.value?.user?.name || 'Anonymous',
-    employeeId: userData?.value?.user?.userId,
+    employee: userData?.data?.name || 'Anonymous',
+    employeeId: userData?.data?.userId,
   }
   try {
     const response: any = await $customFetch('/api/update-cardnet-transaction-status', {
