@@ -27,9 +27,9 @@ const isCardNet = ref(false)
 const route = useRoute()
 const {$customFetch} = useNuxtApp()
 
-async function updateTransactionStatus(routeQuery: LocationQuery) {
+async function updateTransactionStatus(routeQuery: LocationQuery, userId: string) {
   if (isCardNet.value) { //CardNet
-    await updateCardNetTransaction(routeQuery.session)
+    await updateCardNetTransaction(routeQuery.session, userId)
   } else {
     const status = String(routeQuery.status || '').toUpperCase()
     if (status === 'SUCCESS' || status === 'DECLINED') {
@@ -45,7 +45,7 @@ async function updateTransactionStatus(routeQuery: LocationQuery) {
         status: status,
         paymentDate: dayjs(String(routeQuery.DateTime), 'YYYYMMDDHHmmss').format('YYYY-MM-DDTHH:mm:ss') || '',
         employee: userData?.data?.name || 'Anonymous',
-        employeeId: userData?.data?.userId,
+        employeeId: userId,
         responseCodeMessage: responseCodeMessage
       }
       await updateAzulTransaction(data, routeQuery)
@@ -56,12 +56,36 @@ async function updateTransactionStatus(routeQuery: LocationQuery) {
   }
 }
 
-async function updateCardNetTransaction(sessionData: any) {
+async function getUserId() {
+  isLoading.value = true
+  if (userData?.data?.userId) {
+    return userData?.data?.userId
+  }
+  else {
+    const data = await getUserMe()
+    return data?.userId
+  }
+}
+
+async function getUserMe() {
+  try {
+    const response: any = await $customFetch('/api/user/me', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+    return response.data
+  } catch (error: any) {
+  }
+}
+
+async function updateCardNetTransaction(sessionData: any, userId: string) {
   isLoading.value = true
   const data = {
     session: sessionData,
     employee: userData?.data?.name || 'Anonymous',
-    employeeId: userData?.data?.userId,
+    employeeId: userId,
   }
   try {
     const response: any = await $customFetch('/api/update-cardnet-transaction-status', {
@@ -145,11 +169,12 @@ async function updateAzulTransaction(data: IUpdateTransactionStatusAzul, routeQu
 
 }
 
-onMounted(() => {
+onMounted(async () => {
   const status = String(route.query.status || 'error')
   transactionStatus.value = ENUM_TRANSACTION_STATUS[status.toUpperCase() as keyof typeof ENUM_TRANSACTION_STATUS]; // Asignar el estado recibido a transactionStatus
   isCardNet.value = route.query.session !== null && route.query.session !== undefined
-  updateTransactionStatus(route.query)
+  const userId = await getUserId()
+  updateTransactionStatus(route.query, userId)
   // isLoading.value = false // Los datos han sido cargados
 })
 
