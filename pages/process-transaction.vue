@@ -84,7 +84,7 @@ async function updateCardNetTransaction(sessionData: any, userId: string) {
   isLoading.value = true
   const data = {
     session: sessionData,
-    employee: userData?.data?.name || 'Anonymous',
+    employee: userData?.data?.name,
     employeeId: userId,
   }
   try {
