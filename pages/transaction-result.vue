@@ -1,55 +1,67 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import dayjs from 'dayjs'
+import {onMounted, ref} from 'vue'
+import {type LocationQuery, useRoute, useRouter} from 'vue-router'
+import {
+  type ITransactionDetailAzul,
+  type ITransactionDetailCardNet
+} from '~/components/interfaces/ITransactionDetail';
+import TransactionDetailsCardnet from "~/components/transaction-result/transaction-details-cardnet.vue";
+import TransactionDetailsAzul from "~/components/transaction-result/transaction-details-azul.vue";
+import {useTransactionStore} from "~/stores/transaction";
 
+useHead({
+  title: 'Transaction result',
+});
+
+enum ENUM_TRANSACTION_STATUS {
+  SUCCESS = 'success',
+  DECLINED = 'declined',
+  CANCELLED = 'cancelled',
+}
+
+const transactionStore = useTransactionStore()
 const isLoading = ref(true) // Nuevo estado de carga
-const transactionStatus = ref<string>('')
-const orderNumber = ref<string>('')
-const amount = ref<string>('')
-const itbis = ref<string | null>('')
-const authorizationCode = ref<string | null>('')
-const dateTime = ref<string | null>('')
-const responseMessage = ref<string | null>('')
-const isoCode = ref<string | null>('')
-const rrn = ref<string | null>('')
-const cardNumber = ref<string | null>('')
+const transactionStatus = ref<ENUM_TRANSACTION_STATUS>()
+const transactionStatusMessage = ref<string>('')
 const showDetails = ref(false)
+const isCardNet = ref(false)
+const transactionData = ref<ITransactionDetailAzul | ITransactionDetailCardNet | null>()
 
-const route = useRoute()
-const router = useRouter()
+function getDefaultTransactionMessage() {
+  if (transactionStatus.value == ENUM_TRANSACTION_STATUS.SUCCESS) {
+    transactionStatusMessage.value = 'We have successfully processed your payment.'
+  }
+  if (transactionStatus.value == ENUM_TRANSACTION_STATUS.DECLINED) {
+    transactionStatusMessage.value = 'Your payment was declined. Please try again.'
+  }
+  if (transactionStatus.value == ENUM_TRANSACTION_STATUS.CANCELLED) {
+    transactionStatusMessage.value = 'The transaction was cancelled.'
+  }
+}
 
-function disableBackNavigation() {
-  history.pushState(null, document.title, location.href)
-  history.back()
-  history.forward()
-  window.onpopstate = function () {
-    history.go(1)
+async function loadTransactionResult() {
+  try {
+    isLoading.value = true
+    transactionStore.loadTransactionData() //cargar la data del localstorage
+    transactionData.value = transactionStore.transactionData
+    isCardNet.value = transactionData.value?.isCardNet || false
+    if (transactionData.value?.resultStatus) {
+      transactionStatus.value = transactionData.value?.resultStatus
+    }
+    if (transactionData.value?.resultMessage) {
+      transactionStatusMessage.value = transactionData.value?.resultMessage
+    } else {
+      getDefaultTransactionMessage()
+    }
+  }
+  finally {
+    isLoading.value = false
   }
 }
 
 onMounted(() => {
-  // disableBackNavigation()
-
-  const status = route.query.status || 'error'
-
-  transactionStatus.value = String(status) // Asignar el estado recibido a transactionStatus
-  orderNumber.value = String(route.query.OrderNumber) || ''
-  amount.value = (Number.parseFloat(String(route.query.Amount)) / 100).toFixed(2) || '0.00'
-  itbis.value = (Number.parseFloat(String(route.query.Itbis)) / 100).toFixed(2) || '0.00'
-  authorizationCode.value = String(route.query.AuthorizationCode) || ''
-  dateTime.value = dayjs(String(route.query.DateTime), 'YYYYMMDDHHmmss').format('YYYY/MM/DD HH:mm') || ''
-  responseMessage.value = String(route.query.ResponseMessage) || ''
-  isoCode.value = String(route.query.IsoCode) || ''
-  rrn.value = String(route.query.RRN) || ''
-  cardNumber.value = String(route.query.CardNumber) || ''
-
-  isLoading.value = false // Los datos han sido cargados
+  loadTransactionResult()
 })
-
-function goHome() {
-  router.push('/vcc-management')
-}
 
 function toggleDetails() {
   showDetails.value = !showDetails.value
@@ -61,7 +73,7 @@ function toggleDetails() {
     <Card v-if="isLoading" class="loading-card card-bg-color">
       <template #content>
         <div class="loading-container">
-          <ProgressSpinner style="width: 50px; height: 50px;" stroke-width="4" animation-duration=".5s" />
+          <ProgressSpinner style="width: 50px; height: 50px;" stroke-width="4" animation-duration=".5s"/>
           <p class="loading-text">
             Processing your transaction, please wait...
           </p>
@@ -72,45 +84,27 @@ function toggleDetails() {
       <template #content>
         <div class="flex flex-column align-items-center">
           <div class="flex flex-column align-items-center mb-4">
-            <i v-if="transactionStatus === 'success'" class="pi pi-check-circle" style="font-size: 4rem; color: #0F8BFD;" />
-            <i v-if="transactionStatus === 'declined'" class="pi pi-times-circle" style="font-size: 4rem; color: red;" />
-            <i v-if="transactionStatus === 'cancelled'" class="pi pi-exclamation-circle" style="font-size: 4rem; color: orange;" />
+            <i v-if="transactionStatus === ENUM_TRANSACTION_STATUS.SUCCESS" class="pi pi-check-circle"
+               style="font-size: 4rem; color: #0F8BFD;"/>
+            <i v-if="transactionStatus === ENUM_TRANSACTION_STATUS.CANCELLED" class="pi pi-times-circle"
+               style="font-size: 4rem; color: red;"/>
+            <i v-if="transactionStatus === ENUM_TRANSACTION_STATUS.DECLINED" class="pi pi-exclamation-circle"
+               style="font-size: 4rem; color: orange;"/>
             <h2>
-              {{ transactionStatus === 'success' ? 'Transaction Successful!'
-                : transactionStatus === 'declined' ? 'Transaction Declined'
-                  : 'Transaction Cancelled' }}
+              {{
+                transactionStatus === ENUM_TRANSACTION_STATUS.SUCCESS ? 'Transaction Successful!'
+                    : transactionStatus === ENUM_TRANSACTION_STATUS.DECLINED ? 'Transaction Declined'
+                        : 'Transaction Cancelled'
+              }}
             </h2>
-            <p v-if="transactionStatus === 'success'">
-              We have successfully processed your payment.
-            </p>
-            <p v-else-if="transactionStatus === 'declined'">
-              Your payment was declined. Please try again.
-            </p>
-            <p v-else-if="transactionStatus === 'cancelled'">
-              The transaction was cancelled.
-            </p>
+            <p class="text-center">{{transactionStatusMessage}}</p>
           </div>
           <Button label="Show Details" icon="pi pi-chevron-down" style="margin-right: 2px;" @click="toggleDetails"
-                  v-if="transactionStatus === 'success' || transactionStatus === 'declined'"/>
+                  v-if="transactionStatus === ENUM_TRANSACTION_STATUS.SUCCESS || transactionStatus === ENUM_TRANSACTION_STATUS.DECLINED"/>
         </div>
         <div v-if="showDetails" class="details-card">
-          <Card class="" style="background-color: #fff">
-            <template #content>
-              <h4 class="text-center">
-                Transaction Details:
-              </h4>
-              <Divider />
-              <p><strong>Order Number:</strong> {{ route.query.OrderNumber }}</p>
-              <p><strong>Amount:</strong> {{ amount }}</p>
-              <p><strong>ITBIS:</strong> {{ itbis }}</p>
-              <p><strong>Authorization Code:</strong> {{ route.query.AuthorizationCode }}</p>
-              <p><strong>Date and Time:</strong> {{ dateTime }}</p>
-              <p><strong>Merchant Response:</strong> {{ route.query.ResponseMessage }} ({{ route.query.IsoCode }})</p>
-              <p v-if="transactionStatus === 'declined' || transactionStatus === 'cancelled'"><strong>Error Description:</strong> {{ route.query.ErrorDescription }}</p>
-              <p><strong>Reference Number:</strong> {{ route.query.RRN }}</p>
-              <p><strong>Card Number:</strong> {{ route.query.CardNumber }}</p>
-            </template>
-          </Card>
+          <TransactionDetailsCardnet v-if="isCardNet" :transaction-detail="transactionData as ITransactionDetailCardNet"/>
+          <TransactionDetailsAzul v-else :transaction-detail="transactionData as ITransactionDetailAzul"/>
         </div>
       </template>
     </Card>
@@ -124,6 +118,7 @@ function toggleDetails() {
   align-items: center;
   //height: 100vh;
 }
+
 .transaction-container {
   display: flex;
   justify-content: center;

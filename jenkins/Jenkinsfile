@@ -32,7 +32,7 @@ pipeline {
 
         stage ('Init') {
             steps {
-                echo 'Initializing......'
+                echo 'Initializing...'
                 script {   
                     def branch = env.ORIGIN_BRANCH_NAME.replace('origin/', '')
                     env.BRANCH_NAME = branch
@@ -75,7 +75,7 @@ pipeline {
             steps {
                 withKubeConfig(credentialsId: "${SERVER_K3S_CREDENTIALS}", namespace: "${NAMESPACE}", restrictKubeConfigAccess: false, serverUrl: "${SERVER_K3S_URL}") {
                     //sh 'kubectl apply -f $YAML'
-                    //sh 'kubectl rollout restart deploy $DEPLOYMENT_NAME'
+                    sh 'kubectl rollout restart deploy $DEPLOYMENT_NAME'
                 }
             }
         }

@@ -1,7 +1,24 @@
-<script setup>
-import {ref} from 'vue'
+<script setup lang="ts">
+import { useAuthStore } from '@/stores/authStore'
 
-const topbarRef = ref(null)
+const authStore = useAuthStore()
+console.log('Mounting default')
+try {
+  await useAsyncData('userMe', () => authStore.getUserMe().then(true))
+
+  /*const orderedBusinesses = authStore.userData.data.businesses.sort((a, b) => {
+    return a.businessId > b.businessId ? 1 : -1
+  })
+
+  const bussinessSelected = authStore.userData.data.selectedBusiness
+      ? authStore.userData.data.businesses.find(item => item.businessId === authStore.userData.data.selectedBusiness)
+      : orderedBusinesses[0] ?? null
+
+  businessStore.setCurrent(bussinessSelected)*/
+}
+catch (error) {
+  // businessStore.$reset()
+}
 
 </script>
 
